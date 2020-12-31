@@ -3499,6 +3499,14 @@ function UpdateDeviceState(deviceId) {
 	}
 }
 
+function sleep(milliseconds) {
+	const date = Date.now();
+	let currentDate = null;
+	do {
+	  currentDate = Date.now();
+	} while (currentDate - date < milliseconds);
+  }
+
 function RunAction(deviceId, busId, active) {
 	let actionObj = null;
 
@@ -3629,6 +3637,7 @@ function RunAction_TSL_31_TCP(data) {
 	}
 }
 
+/*
 function RunAction_Webhook(data) {
 	try {
 		let path = (data.path.startsWith('/') ? data.path : '/' + data.path);
@@ -3650,6 +3659,40 @@ function RunAction_Webhook(data) {
 		.catch(function (error) {
 			logger(`An error occured triggering the Outgoing Webhook: ${error}`, 'error');
 		});
+	}
+	catch (error) {
+		logger(`An error occured sending the Outgoing Webhook: ${error}`, 'error');
+	}
+}*/
+
+function RunAction_Webhook(data) {
+	try {
+		let path = (data.path.startsWith('/') ? data.path : '/' + data.path);
+
+		let options = {
+			hostname: data.ip,
+			port: data.port,
+			path: path,
+			method: data.method,
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+				'Content-Length': data.postdata.length
+			}
+
+		}
+
+		//I use "http.request" instead of "https.request" since IOT clients may not have the ability to do https certificate connections.
+		const req = http.request(options, res => {
+			logger(`statusCode: ${res.statusCode}`)
+		  });
+		  
+		  req.on('error', error => {
+			logger(`An error occured sending the Outgoing Webhook: ${error}`, 'error');
+		  });
+		  
+		  req.write(data.postdata);
+		  req.end();
+
 	}
 	catch (error) {
 		logger(`An error occured sending the Outgoing Webhook: ${error}`, 'error');
