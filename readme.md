@@ -1,3 +1,5 @@
+# Based on [Joseph Adams' TallyArbiter](https://github.com/josephdadams/TallyArbiter). Modified for use with ESP32 and http webhooks.
+
 # Tally Arbiter
 Tally Arbiter was written by Joseph Adams and is distributed under the MIT License.
 
